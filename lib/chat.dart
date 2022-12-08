@@ -1,6 +1,6 @@
 import 'package:chat/mainScreen.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
-import 'package:readmore/readmore.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -12,6 +12,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _formKey = GlobalKey<FormState>();
 
+  
+
   final _textController = TextEditingController();
 
   List chat = [
@@ -22,7 +24,11 @@ class _ChatPageState extends State<ChatPage> {
     {"message": "I'll like to reserver a dinner table at 7:00 pm ", "id": 1},
     {"message": "Your reservation has been saved!", "id": 2},
     {"message": "Please make sure to be on time!", "id": 2},
-    {"message": "Sure i'll keep time.And can i make a special order?", "id": 1},
+    {
+      "message":
+          "Sure i'll keep time.And can i make a special order?Sure i'll keep time.And can i make a special order?",
+      "id": 1
+    },
     {
       "message": "I'm sorry we are not offering special offers for now.",
       "id": 2
@@ -91,47 +97,34 @@ class _ChatPageState extends State<ChatPage> {
                       )
                     : ListView.builder(
                         itemCount: chat.length,
-                        itemBuilder: (BuildContext ctx, index) => chat[index]
-                                    ['id'] ==
-                                1
-                            ? Container(
-                                width: 75,
-                                child: Card(
-                                  elevation: 2,
-                                  color: Colors.white12,
-                                  child: Column(
+                        itemBuilder: (BuildContext ctx, index) =>
+                            chat[index]['id'] == 1
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      ListTile(
-                                        onLongPress: () {},
-                                        subtitle: ReadMoreText(
-                                          "${chat[index]['message']}",
-                                          trimLines: 1,
-                                          trimMode: TrimMode.Length,
-                                          colorClickableText: Colors.green,
-                                          trimCollapsedText: "more",
-                                          trimExpandedText: "less",
-                                          lessStyle: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          moreStyle: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                      BubbleSpecialOne(
+                                          text: "${chat[index]['message']}",
+                                          isSender: false,
+                                          color: Colors.green.shade100,
+                                          textStyle: const TextStyle(
+                                              fontSize: 15,
+                                              //color: Colors.purple,
+                                              fontStyle: FontStyle.italic)),
                                     ],
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                width: 50,
-                                margin: const EdgeInsets.all(18.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(20.0)),
-                                alignment: Alignment.topRight,
-                                child: Text(chat[index]['message']))),
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      BubbleSpecialOne(
+                                          text: "${chat[index]['message']}",
+                                          isSender: false,
+                                          color: Colors.purple.shade100,
+                                          textStyle: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.purple,
+                                              fontStyle: FontStyle.italic)),
+                                    ],
+                                  )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
@@ -206,7 +199,27 @@ class _ChatPageState extends State<ChatPage> {
                                     color: Colors.blue,
                                   ),
                                   onPressed: () {
+                                    chat.add({
+                                      "message": _textController.text,
+                                      "id": 1
+                                    });
                                     _textController.clear();
+                                    setState(() {});
+                                  },
+                                ),
+                                IconButton(
+                                  splashRadius: 20,
+                                  icon: const Icon(
+                                    Icons.send,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {
+                                    chat.add({
+                                      "message": _textController.text,
+                                      "id": 2
+                                    });
+                                    _textController.clear();
+                                    setState(() {});
                                   },
                                 ),
                               ],
