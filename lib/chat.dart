@@ -1,6 +1,7 @@
 import 'package:chat/mainScreen.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -12,7 +13,27 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _formKey = GlobalKey<FormState>();
 
-  
+  late IO.Socket socket;
+  sendMessage() {
+    socket.emit('message', {'message': "Hola Armsy", 'Sender': 'Armsy326'});
+  }
+
+  socketConnection() {
+    socket.onConnect((data) => print("Connected + $data"));
+    socket.onDisconnect((data) => print("Disconnected + $data"));
+    socket.onConnectError((data) => print('Erro:  + $data'));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    socket = IO.io(
+        'http://localhost:5000',
+        IO.OptionBuilder().setTransports(['websocket']).setQuery(
+            {'username': "armsy"}).build());
+    socketConnection();
+  }
 
   final _textController = TextEditingController();
 
@@ -190,39 +211,17 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  splashRadius: 20,
-                                  icon: const Icon(
-                                    Icons.send,
-                                    color: Colors.blue,
-                                  ),
-                                  onPressed: () {
-                                    chat.add({
-                                      "message": _textController.text,
-                                      "id": 1
-                                    });
-                                    _textController.clear();
-                                    setState(() {});
-                                  },
-                                ),
-                                IconButton(
-                                  splashRadius: 20,
-                                  icon: const Icon(
-                                    Icons.send,
-                                    color: Colors.blue,
-                                  ),
-                                  onPressed: () {
-                                    chat.add({
-                                      "message": _textController.text,
-                                      "id": 2
-                                    });
-                                    _textController.clear();
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
+                            IconButton(
+                              splashRadius: 20,
+                              icon: const Icon(
+                                Icons.send,
+                                color: Colors.blue,
+                              ),
+                              onPressed: () {
+                                sendMessage();
+                                _textController.clear();
+                                setState(() {});
+                              },
                             ),
                           ],
                         ),
