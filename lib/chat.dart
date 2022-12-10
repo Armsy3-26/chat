@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat/mainScreen.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +13,33 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final _formKey = GlobalKey<FormState>();
+  final _textController = TextEditingController();
+
+  String status = "Establishing Connection....";
+
+  late String errors;
 
   late IO.Socket socket;
-  sendMessage() {
-    socket.emit('message', {'message': "Hola Armsy", 'Sender': 'Armsy326'});
+  sendMessage(msg) {
+    socket.emit('message', {'message': msg, 'Sender': 'Armsy326'});
   }
 
   socketConnection() {
-    socket.onConnect((data) => print("Connected + $data"));
-    socket.onDisconnect((data) => print("Disconnected + $data"));
-    socket.onConnectError((data) => print('Erro:  + $data'));
+    socket.onConnect((data) {
+      status = "Connected to Server";
+      setState(() {});
+    });
+    socket.onDisconnect((data) {
+      status = "Disconnected from Server";
+      setState(() {});
+    });
+    socket.onConnectError((data) {
+      errors = data;
+    });
+    socket.on('message', (data) {
+      chat.add({"message": data, "id": 2});
+      setState(() {});
+    });
   }
 
   @override
@@ -35,31 +53,7 @@ class _ChatPageState extends State<ChatPage> {
     socketConnection();
   }
 
-  final _textController = TextEditingController();
-
-  List chat = [
-    {"message": "Hello", "id": 1},
-    {"message": "Hey, how may i assist you", "id": 2},
-    {"message": "Do you guys offer reservations?", "id": 1},
-    {"message": "Yes, we do offer reservations.", "id": 2},
-    {"message": "I'll like to reserver a dinner table at 7:00 pm ", "id": 1},
-    {"message": "Your reservation has been saved!", "id": 2},
-    {"message": "Please make sure to be on time!", "id": 2},
-    {
-      "message":
-          "Sure i'll keep time.And can i make a special order?Sure i'll keep time.And can i make a special order?",
-      "id": 1
-    },
-    {
-      "message": "I'm sorry we are not offering special offers for now.",
-      "id": 2
-    },
-    {"message": "Okay. Thank you for the service.", "id": 1},
-    {
-      "message": "Your welcomed!, Always contact us for clarifications.",
-      "id": 2
-    },
-  ];
+  List chat = [];
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +64,12 @@ class _ChatPageState extends State<ChatPage> {
         elevation: 0,
         backgroundColor: Colors.yellow,
         title: Column(
-          children: const [
-            Text("OutReach", style: TextStyle(color: Colors.black)),
+          children: [
+            const Text("OutReach", style: TextStyle(color: Colors.black)),
             Align(
               alignment: Alignment.center,
-              child: Text("This conversation will self-destruct on exit!",
-                  style: TextStyle(fontSize: 7, color: Colors.black)),
+              child: Text(status,
+                  style: const TextStyle(fontSize: 7, color: Colors.black)),
             ),
           ],
         ),
@@ -110,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                                 height: 20,
                               ),
                               const Text(
-                                'No outreach to restraunt name',
+                                'No outreach to restraunt name\n\nConversation will self-destruct on exit.',
                               ),
                             ],
                           ),
@@ -186,7 +180,7 @@ class _ChatPageState extends State<ChatPage> {
                                           hintStyle: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey.shade700),
-                                          hintText: 'Type a message',
+                                          hintText: 'Alixe:)-',
                                           border: InputBorder.none,
                                           filled: true,
                                           fillColor: Colors.grey.shade100,
@@ -218,9 +212,16 @@ class _ChatPageState extends State<ChatPage> {
                                 color: Colors.blue,
                               ),
                               onPressed: () {
-                                sendMessage();
-                                _textController.clear();
-                                setState(() {});
+                                if (_textController.text.isNotEmpty) {
+                                  chat.add({
+                                    'message': _textController.text,
+                                    'id': 1
+                                  });
+                                  setState(() {});
+                                  sendMessage(_textController.text);
+                                  _textController.clear();
+                                  setState(() {});
+                                }
                               },
                             ),
                           ],
