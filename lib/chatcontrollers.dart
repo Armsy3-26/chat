@@ -8,7 +8,11 @@ class ChatController extends GetxController {
 
   socketConnection() {
     socket.onConnect((data) {
-      socket.emit("connection", "cooler");
+      if (data != null) {
+        print(data);
+      }
+      socket.emit(
+          "connection", {'sender': 'cooler', 'receiver': 'Cloud Restaraunt'});
       status = "Connected.";
 
       update();
@@ -24,18 +28,27 @@ class ChatController extends GetxController {
       update();
     });
     socket.on('message', (data) {
-      chat.add({"message": data, "id": 2});
+      DateTime now = DateTime.now();
+      print(data);
+      if (data['sender'] == "AliXe-Server") {
+        print(data);
+      } else {
+        chat.add({
+          "message": data['message'],
+          "id": 2,
+          'datetime': "${now.hour}:${now.minute}",
+          'status': true
+        });
+      }
+
       update();
     });
   }
 
   //sending a message to restaraunt client
   sendMessage(msg) {
-    socket.emit('message', {
-      'message': msg,
-      'receiver': 'Yummy Restaraunt.',
-      'sender': 'alixe-client'
-    });
+    socket.emit('message',
+        {'message': msg, 'receiver': 'Cloud Restaurant', 'sender': 'cooler'});
 
     update();
   }
@@ -47,7 +60,13 @@ class ChatController extends GetxController {
     DateTime now = DateTime.now();
 
     chat.add(
-        {'message': msg, 'id': 1, 'datetime': "${now.hour}:${now.minute}"});
+      {
+        'message': msg,
+        'id': 1,
+        'datetime': "${now.hour}:${now.minute}",
+        'status': true
+      },
+    );
     update();
   }
 
@@ -59,6 +78,7 @@ class ChatController extends GetxController {
     "Hey",
     "Can I book a reservation?",
     "Can I get a refund?",
-    "Thanks"
+    "Thanks",
+    "Hey restraunt name"
   ];
 }

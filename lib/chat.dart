@@ -31,37 +31,46 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ChatController>(builder: (_) {
-      return Scaffold(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.yellow,
+      appBar: AppBar(
+        bottomOpacity: 0,
+        elevation: 0,
         backgroundColor: Colors.yellow,
-        appBar: AppBar(
-          bottomOpacity: 0,
-          elevation: 0,
-          backgroundColor: Colors.yellow,
-          title: Column(
-            children: [
-              const Text("OutReach", style: TextStyle(color: Colors.black)),
-              Align(
-                alignment: Alignment.center,
-                child: Text(chatController.status ?? "Connecting...",
-                    style: TextStyle(fontSize: 7.sp, color: Colors.black)),
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.restore))
-          ],
-          centerTitle: true,
-        ),
-        body: Stack(
-          fit: StackFit.expand,
+        title: Column(
           children: [
-            Column(
-              children: [
-                Expanded(
+            const Text("OutReach", style: TextStyle(color: Colors.black)),
+            Align(
+              alignment: Alignment.center,
+              child: GetBuilder<ChatController>(builder: (context) {
+                return Text(chatController.status ?? "Connecting...",
+                    style: TextStyle(fontSize: 7.sp, color: Colors.black));
+              }),
+            ),
+          ],
+        ),
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new)),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.restore))
+        ],
+        centerTitle: true,
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GetBuilder<ChatController>(builder: (_) {
+                return Expanded(
                   child: chatController.chat.isEmpty
                       ? Container(
-                          color: Colors.pink,
+                          //color: Colors.pink,
                           padding: EdgeInsets.symmetric(vertical: 8.w),
                           child: Center(
                             child: Column(
@@ -89,6 +98,11 @@ class _ChatPageState extends State<ChatPage> {
                                   ? Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
+                                        Text(
+                                            "${chatController.chat[index]['datetime']}",
+                                            style: TextStyle(
+                                                fontSize: 10.sp,
+                                                fontStyle: FontStyle.italic)),
                                         BubbleSpecialOne(
                                             text:
                                                 "${chatController.chat[index]['message']}",
@@ -106,150 +120,143 @@ class _ChatPageState extends State<ChatPage> {
                                       children: [
                                         BubbleSpecialOne(
                                             text:
-                                                "${chatController.chat[index]['message']['message']}",
+                                                "${chatController.chat[index]['message']}",
                                             isSender: false,
                                             color: Colors.purple.shade100,
                                             textStyle: TextStyle(
                                                 fontSize: 15.sp,
                                                 color: Colors.purple,
                                                 fontStyle: FontStyle.italic)),
+                                        Text(
+                                            "${chatController.chat[index]['datetime']}",
+                                            style: TextStyle(
+                                                fontSize: 10.sp,
+                                                fontStyle: FontStyle.italic)),
                                       ],
                                     )),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Card(
-                    margin: EdgeInsets.zero,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                              right: 8.r,
-                              left: 8.r,
-                              bottom:
-                                  MediaQuery.of(context).viewInsets.bottom > 0.r
-                                      ? 15.r
-                                      : 28.r,
-                              top: 8)
-                          .r,
-                      child: Stack(
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                //color: Colors.blue,
-                                height: 55,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: EdgeInsets.all(10.0.r),
-                                  children: chatController.hotWords
-                                      .map(
-                                        (e) => Wrap(children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              chatController
-                                                  .addSenderMessage(e);
-                                              print(chatController.chat);
-                                              // sendMessage(_textController.text);
-                                            },
-                                            child: Chip(
-                                                padding: EdgeInsets.all(8.0.r),
-                                                label: Text(e)),
-                                          ),
-                                          SizedBox(
-                                            width: 2.w,
-                                          )
-                                        ]),
-                                      )
-                                      .toList(),
-                                ),
+                );
+              }),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Card(
+                  color: Colors.yellow,
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      right: 8.r,
+                      left: 8.r,
+                      bottom: MediaQuery.of(context).viewInsets.bottom > 0.r
+                          ? 7.5.r
+                          : 14.r,
+                      //top: 2.r, //no to margin near hot and message input
+                    ),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            SizedBox(
+                              // color: Colors.blue,
+                              height: 55,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                padding: EdgeInsets.all(10.0.r),
+                                children: chatController.hotWords
+                                    .map(
+                                      (e) => Wrap(children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            chatController.addSenderMessage(e);
+
+                                            chatController.sendMessage(e);
+                                          },
+                                          child: Chip(
+                                              padding: EdgeInsets.all(8.0.r),
+                                              label: Text(e)),
+                                        ),
+                                        SizedBox(
+                                          width: 2.w,
+                                        )
+                                      ]),
+                                    )
+                                    .toList(),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            margin:
-                                                EdgeInsets.only(bottom: 5.r),
-                                            child: TextField(
-                                              controller: _textController,
-                                              minLines: 1,
-                                              maxLines: 5,
-                                              cursorColor: Colors.black,
-                                              decoration: InputDecoration(
-                                                isDense: true,
-                                                contentPadding: EdgeInsets.only(
-                                                    right: 16.r,
-                                                    left: 20.r,
-                                                    bottom: 10.r,
-                                                    top: 10.r),
-                                                hintStyle: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    color:
-                                                        Colors.grey.shade700),
-                                                hintText: 'Alixe:)-',
-                                                border: InputBorder.none,
-                                                filled: true,
-                                                fillColor: Colors.grey.shade100,
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.r),
-                                                  gapPadding: 0,
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Colors.grey.shade200),
-                                                ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.r),
-                                                  gapPadding: 0,
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Colors.grey.shade300),
-                                                ),
-                                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _textController,
+                                          minLines: 1,
+                                          maxLines: 5,
+                                          cursorColor: Colors.black,
+                                          decoration: InputDecoration(
+                                            isDense: true,
+                                            contentPadding: EdgeInsets.only(
+                                                right: 16.r,
+                                                left: 20.r,
+                                                bottom: 10.r,
+                                                top: 10.r),
+                                            hintStyle: TextStyle(
+                                                fontSize: 14.sp,
+                                                color: Colors.grey.shade700),
+                                            hintText: 'Alixe:)-',
+                                            border: InputBorder.none,
+                                            filled: true,
+                                            fillColor: Colors.grey.shade100,
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.r),
+                                              gapPadding: 0,
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade200),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.r),
+                                              gapPadding: 0,
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey.shade300),
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    splashRadius: 20.r,
-                                    icon: const Icon(
-                                      Icons.send,
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      if (_textController.text.isNotEmpty) {
-                                        chatController.addSenderMessage(
-                                            _textController.text);
-                                        chatController
-                                            .sendMessage(_textController.text);
-                                        _textController.clear();
-                                      }
-                                    },
+                                ),
+                                IconButton(
+                                  splashRadius: 20.r,
+                                  icon: const Icon(
+                                    Icons.send,
+                                    color: Colors.blue,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                                  onPressed: () {
+                                    if (_textController.text.isNotEmpty) {
+                                      chatController.addSenderMessage(
+                                          _textController.text);
+                                      /*chatController
+                                          .sendMessage(_textController.text);*/
+                                      _textController.clear();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      );
-    });
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
