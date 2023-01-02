@@ -6,19 +6,24 @@ class ChatController extends GetxController {
   //establishing connection statuses and receiving restaraunt messages
   String? status;
 
+  String? receiverConnectionStatus;
+
   socketConnection() {
     socket.onConnect((data) {
       if (data != null) {
-        print(data);
+        print(data + "fucks");
       }
-      socket.emit(
-          "connection", {'sender': 'cooler', 'receiver': 'Cloud Restaraunt'});
-      status = "Connected.";
+      socket.emit("connection", {
+        'sender': 'cooler',
+        'receiver': 'Future Restaurant',
+        'origin': 'user'
+      });
+      status = "You Connected.";
 
       update();
     });
     socket.onDisconnect((data) {
-      status = "Disconnected.";
+      status = "You Disconnected.";
       update();
     });
     socket.onConnectError((data) {
@@ -29,8 +34,8 @@ class ChatController extends GetxController {
     });
     socket.on('message', (data) {
       DateTime now = DateTime.now();
-      print(data);
-      if (data['sender'] == "AliXe-Server") {
+
+      if (data['feedback'] == "Sent-Status") {
         print(data);
       } else {
         chat.add({
@@ -43,12 +48,18 @@ class ChatController extends GetxController {
 
       update();
     });
+
+    socket.on("connectionstatus", (data) {
+      receiverConnectionStatus = data['feedback'];
+
+      update();
+    });
   }
 
   //sending a message to restaraunt client
   sendMessage(msg) {
     socket.emit('message',
-        {'message': msg, 'receiver': 'Cloud Restaurant', 'sender': 'cooler'});
+        {'message': msg, 'receiver': 'Future Restaurant', 'sender': 'cooler'});
 
     update();
   }

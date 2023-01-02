@@ -181,6 +181,13 @@ class _ChatPageState extends State<ChatPage> {
                                     .toList(),
                               ),
                             ),
+                            GetBuilder<ChatController>(builder: (_) {
+                              return Text(
+                                chatController.receiverConnectionStatus ??
+                                    "Linking with restraut name...",
+                                style: TextStyle(fontSize: 10.sp),
+                              );
+                            }),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.end,
