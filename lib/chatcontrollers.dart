@@ -54,6 +54,32 @@ class ChatController extends GetxController {
 
       update();
     });
+
+    socket.on('restore', (data) {
+      if (data['status'] == "ok") {
+        for (var index = 0; index < data['conversation'].length; index++) {
+          if (data['conversation'][index]['id'] == 1) {
+            chat.add({
+              "message": data['conversation'][index]['message'],
+              "id": 2,
+              "datetime": data['conversation'][index]['time']
+            });
+          } else {
+            chat.add({
+              "message": data['conversation'][index]['message'],
+              "id": 1,
+              "datetime": data['conversation'][index]['time']
+            });
+          }
+        }
+
+        chat.add(data['conversation'][0]);
+      } else if (data['status'] == "failed") {
+        print(data['status']);
+      }
+
+      update();
+    });
   }
 
   //sending a message to restaraunt client
@@ -62,6 +88,19 @@ class ChatController extends GetxController {
         {'message': msg, 'receiver': 'Future Restaurant', 'sender': 'cooler'});
 
     update();
+  }
+
+//requesting/trying to retrieve a conversation
+//takes username as a payload
+
+  retrieveConversation() {
+    socket.emit('restore', {
+      {
+        "username": "cooler",
+        "requested": 'Future Restaurant',
+        "origin": 'client'
+      }
+    });
   }
 
 //adds sender message to chat list

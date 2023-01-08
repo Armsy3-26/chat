@@ -23,7 +23,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     chatController.socket = IO.io(
-        'http://127.0.0.1:5000',
+        'http://localhost:5000',
         IO.OptionBuilder().setTransports(['websocket']).setQuery(
             {'username': "armsy"}).build());
     chatController.socketConnection();
@@ -56,7 +56,11 @@ class _ChatPageState extends State<ChatPage> {
             },
             icon: const Icon(Icons.arrow_back_ios_new)),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.restore))
+          IconButton(
+              onPressed: () {
+                chatController.retrieveConversation();
+              },
+              icon: const Icon(Icons.restore))
         ],
         centerTitle: true,
       ),
